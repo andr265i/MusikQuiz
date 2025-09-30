@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <title>Musik Quiz</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background: #111; color: #fff; }
+    table { margin: 20px auto; border-collapse: collapse; }
+    th, td { border: 1px solid #ff6900; padding: 20px; width: 150px; cursor: pointer; }
+    th { background: #ff6900; }
+    td.used { background: #333; color: #666; cursor: default; }
+    .setup, .scoreboard { margin-top: 30px; }
+    .scoreboard { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+    .team { background: #222; padding: 15px; border-radius: 10px; min-width: 120px; }
+    .team h2 { margin: 0 0 10px; }
+    .team button { margin: 5px; padding: 8px 12px; cursor: pointer; }
+    input { padding: 5px; margin: 5px; }
+    button.start { padding: 10px 20px; margin-top: 10px; }
+
+  </style>
+</head>
+<body>
+  <h1>🎵 Musik Quiz 🎵</h1>
+
+  <!-- Quiz board -->
+  <table>
+    <tr>
+      <th>80'erne</th>
+      <th>Dansk Pop</th>
+      <th>Medieval style</th>
+      <th>Do You Even Binge Bro?</th>
+      <th>Covers</th>
+    </tr>
+    <tr>
+      <td onclick="playSong('80s1', this,100)">100</td>
+      <td onclick="playSong('dkpop1', this,100)">100</td>
+      <td onclick="playSong('rock1', this,100)">100</td>
+      <td onclick="playSong('serie1', this,100)">100</td>
+      <td onclick="playSong('onehit1', this,100)">100</td>
+    </tr>
+    <tr>
+      <td onclick="playSong('80s2', this,200)">200</td>
+      <td onclick="playSong('dkpop2', this,200)">200</td>
+      <td onclick="playSong('rock2', this,200)">200</td>
+      <td onclick="playSong('serie2', this,200)">200</td>
+      <td onclick="playSong('onehit2', this,200)">200</td>
+    </tr>
+    <tr>
+      <td onclick="playSong('80s3', this,300)">300</td>
+      <td onclick="playSong('dkpop3', this,300)">300</td>
+      <td onclick="playSong('medieval3', this,300)">300</td>
+      <td onclick="playSong('serie3', this,300)">300</td>
+      <td onclick="playSong('cover3', this,300)">300</td>
+    </tr>
+    <tr>
+      <td onclick="playSong('80s4', this,400)">400</td>
+      <td onclick="playSong('dkpop4', this,400)">400</td>
+      <td onclick="playSong('rock4', this,400)">400</td>
+      <td onclick="playSong('serie4', this,400)">400</td>
+      <td onclick="playSong('onehit4', this,400)">400</td>
+    </tr>
+    <tr>
+      <td onclick="playSong('80s5', this,500)">500</td>
+      <td onclick="playSong('dkpop5', this,500)">500</td>
+      <td onclick="playSong('rock5', this,500)">500</td>
+      <td onclick="playSong('serie5', this,500)">500</td>
+      <td onclick="playSong('onehit5', this,500)">500</td>
+    </tr>
+  </table>
+  
+
+  <audio id="player" controls style="margin-top:20px; width:80%;">
+    Din browser understøtter ikke audio.
+  </audio>
+
+  <!-- Setup -->
+  <div class="setup" id="setup">
+    <h2>Indtast holdnavne</h2>
+    <div id="teamInputs"></div>
+    <button class="start" onclick="startGame()">Start spil</button>
+  </div>
+
+  <!-- Scoreboard -->
+  <h2>Scoreboard</h2>
+  <div class="scoreboard" id="scoreboard"></div>
+
+  <script>
+    // antal hold – ændr her
+    const numberOfTeams = 4;
+
+    const songs = {
+      "80s1": "music/80s1.mp3",
+      "80s2": "music/80s2.mp3",
+      "80s3": "music/80s3.mp3",
+      "80s4": "music/80s4.mp3",
+      "80s5": "music/80s5.mp3",
+      "dkpop1": "music/dkpop1.mp3",
+      "dkpop2": "music/dkpop2.mp3",
+      "medieval3": "music/medieval3.mp3",
+      "cover3": "music/cover3.mp3",
+      "serie1": "music/serie1.mp3",
+      "serie3": "music/serie3.mp3",
+      "serie4": "music/serie4.mp3",
+      "serie5": "music/serie5.mp3"
+
+      // ... fortsæt for alle 25
+    };
+
+    let lastPoints = 0;
+    const scores = Array(numberOfTeams).fill(0);
+    const teamNames = Array(numberOfTeams).fill(null);
+
+    function playSong(key, cell, points) {
+      if (cell.classList.contains("used")) return;
+      const player = document.getElementById("player");
+      player.src = songs[key];
+      player.play();
+      lastPoints = points;
+      cell.classList.add("used");
+    }
+
+    function addPoints(teamIndex) {
+      scores[teamIndex] += lastPoints;
+      document.getElementById("score" + teamIndex).textContent = scores[teamIndex];
+    }
+
+    function removePoints(teamIndex) {
+      scores[teamIndex] -= lastPoints;
+      if (scores[teamIndex] < 0) scores[teamIndex] = 0;
+      document.getElementById("score" + teamIndex).textContent = scores[teamIndex];
+    }
+
+    // Setup inputs
+    const teamInputsEl = document.getElementById("teamInputs");
+    for (let i = 0; i < numberOfTeams; i++) {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "Hold " + (i + 1) + " navn";
+      input.id = "teamInput" + i;
+      teamInputsEl.appendChild(input);
+      teamInputsEl.appendChild(document.createElement("br"));
+    }
+
+    function startGame() {
+      for (let i = 0; i < numberOfTeams; i++) {
+        const name = document.getElementById("teamInput" + i).value.trim();
+        teamNames[i] = name || "Hold " + (i + 1);
+      }
+      document.getElementById("setup").style.display = "none";
+      renderScoreboard();
+    }
+
+    function renderScoreboard() {
+      const scoreboardEl = document.getElementById("scoreboard");
+      scoreboardEl.innerHTML = "";
+      scores.forEach((score, i) => {
+        const teamDiv = document.createElement("div");
+        teamDiv.className = "team";
+        teamDiv.innerHTML = `
+          <h2>${teamNames[i]}</h2>
+          <p id="score${i}">${score}</p>
+          <button onclick="addPoints(${i})">+ Point</button>
+          <button onclick="removePoints(${i})">- Point</button>
+        `;
+        scoreboardEl.appendChild(teamDiv);
+      });
+    }
+  </script>
+</body>
+</html>
